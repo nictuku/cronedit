@@ -1,7 +1,9 @@
 cronedit
 ========
 
-Manipulate the user crontab from Go. Usage:
+Manipulate the user crontab from Go. It's used by [zmon](https://github.com/nictuku/zmon).
+
+Usage:
 
 
 ```
