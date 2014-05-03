@@ -1,6 +1,9 @@
 package cronedit
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestCronEdit(t *testing.T) {
 
@@ -32,11 +35,18 @@ MAILTO=""
 	}
 }
 
-// DisabledTestCronInsert really updates the current user crontab, so it's disabled.
-func DisabledTestCronInsert(t *testing.T) {
-	changed, err := Insert("@hourly nohup $HOME/bin/zmon &")
-	t.Logf("TestCronInsert: changed %v, err %v", changed, err)
+// ExampleCronInsert inspects the crontab for the current user and adds the specified command if it's not already there.
+func ExampleCronInsert() {
+	_, err := Insert("@hourly update-something")
 	if err != nil {
-		t.Error(err)
+		fmt.Println("Crontab edit error:", err)
+		return
+	}
+}
+
+func init() {
+	// Do not really maniuplate the crontab when running tests.
+	replaceCrontab = func(newContent string) error {
+		return nil
 	}
 }

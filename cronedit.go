@@ -20,6 +20,16 @@ func edit(input string, insert string) (bool, string) {
 	return true, fmt.Sprintf("%v\n%v\n", input, insert)
 }
 
+var replaceCrontab = func(newContent string) error {
+	// There is no other programmatic way of editing a user's crontab. That operation requires root
+	// permission, so we need to use crontab(1) because it has suid privileges.
+	cronEdit := exec.Command("crontab", "-")
+	cronEdit.Stdin = strings.NewReader(newContent)
+	out, err := cronEdit.Output()
+	fmt.Println("out", string(out))
+	return err
+}
+
 // Insert adds the specified command to the current user's crontab, unless it's already present. It
 // returns true if modifications were made.
 func Insert(command string) (bool, error) {
@@ -31,9 +41,5 @@ func Insert(command string) (bool, error) {
 	if !needChange {
 		return false, nil
 	}
-	// There is no other programmatic way of editing a user's crontab. That operation requires root
-	// permission, so we need to use crontab(1) because of its suid privileges.
-	cronEdit := exec.Command("crontab", "-")
-	cronEdit.Stdin = strings.NewReader(newContent)
-	return true, cronEdit.Run()
+	return true, replaceCrontab(newContent)
 }
